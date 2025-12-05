@@ -70,6 +70,18 @@ def summarize_with_gpt(term, raw_text):
         print(f"\n[API ERROR] {term}: {e}")
         time.sleep(2)
         return None
+    
+def load_existing_data(filepath):
+    """기존 JSON 파일이 있으면 로드"""
+    if os.path.exists(filepath):
+        with open(filepath, 'r', encoding='utf-8') as f:
+            return json.load(f)
+    return {}
+
+def save_data(filepath, data):
+    """데이터를 JSON 파일로 저장"""
+    with open(filepath, 'w', encoding='utf-8') as f:
+        json.dump(data, f, ensure_ascii=False, indent=4)
 
 def find_definition_range(full_text, current_term, next_term):
     """
@@ -114,13 +126,19 @@ def main():
     if not full_pdf_text:
         return
 
-    final_data = {}
+    # 3. 기존 진행상황 로드 (이어하기)
+    final_data = load_existing_data(output_file)
+    print(f"기존 데이터 로드: {len(final_data)}개")
+
     failed_terms = []
 
     print("\nAI 요약 및 데이터 생성 시작")
     
     for i, term in enumerate(tqdm(terms)):
         current_term = term.strip()
+        if current_term in final_data:
+            continue
+
         next_term = terms[i+1].strip() if i + 1 < len(terms) else None
         
         try:
@@ -136,10 +154,11 @@ def main():
                     final_data[current_term] = {
                         "summary": summary
                     }
+                    save_data(output_file, final_data)
                 else:
                     failed_terms.append(current_term) # API 실패
                 
-                # Rate Limit 방지를 위한 딜레이 (0.5초)
+                # Rate Limit 방지
                 time.sleep(0.5) 
             else:
                 # PDF에서 단어를 못 찾음
