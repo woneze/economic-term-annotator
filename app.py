@@ -41,15 +41,11 @@ def main():
             ai_summary = summarize_text_with_ai(user_input, matched_terms)
 
         st.divider()
-            
-        col1, col2 = st.columns([2, 1]) # 왼쪽(본문)을 더 넓게
         
-        with col1:
-            st.subheader(f"본문에서 ({count}개 용어를 발견했습니다.)")
-            st.markdown(f'<div class="text-output">{final_html}</div>', unsafe_allow_html=True)
-            
-        with col2:
-            st.subheader("AI 3줄 요약")
-            st.markdown(f'<div class="summary-box">{ai_summary}</div>', unsafe_allow_html=True)
+        st.subheader(f"본문에서 ({count}개 용어를 발견했습니다.)")
+        st.markdown(f'<div class="text-output">{final_html}</div>', unsafe_allow_html=True)
+        
+        st.subheader("AI 3줄 요약")
+        st.markdown(f'<div class="summary-box">{ai_summary}</div>', unsafe_allow_html=True)
 if __name__ == "__main__":
     main()
