@@ -1,0 +1,9 @@
+streamlit
+kiwipiepy
+openai
+python-dotenv
+PyMuPDF
+pdfplumber
+pandas
+tqdm
+
