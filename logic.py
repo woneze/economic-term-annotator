@@ -56,8 +56,8 @@ def annotate_text_with_kiwi(text, term_dict, kiwi):
     
     return "".join(result_text), match_count, matched_terms
 
-# OpenAI 요약 기능 (RAG 적용)
 def summarize_text_with_ai(text, matched_terms=None):
+    """OpenAI 요약 기능 (RAG 적용)"""
     load_dotenv()  # .env 파일 로드
     api_key = os.getenv("OPENAI_API_KEY")  # 환경 변수에서 읽기
     if not api_key:
