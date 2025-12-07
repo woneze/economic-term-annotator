@@ -29,6 +29,7 @@ def annotate_text_with_kiwi(text, term_dict, kiwi):
     result_text = []
     last_end = 0
     match_count = 0
+    matched_terms = {}  # RAG용 매칭된 용어 저장
 
     for token in tokens:
         # 공백 및 비토큰 문자 보존
@@ -43,6 +44,9 @@ def annotate_text_with_kiwi(text, term_dict, kiwi):
             tooltip = f"""<span class="term-highlight">{token_str}<span class="tooltip-text"><strong>💡 {clean_key}</strong><br><hr style="margin:5px 0">{summary}</span></span>"""
             result_text.append(tooltip)
             match_count += 1
+            # RAG용: 매칭된 용어와 요약 저장 (중복 방지)
+            if clean_key not in matched_terms:
+                matched_terms[clean_key] = summary
         else:
             result_text.append(token_str)
             
@@ -50,10 +54,10 @@ def annotate_text_with_kiwi(text, term_dict, kiwi):
 
     result_text.append(text[last_end:])
     
-    return "".join(result_text), match_count
+    return "".join(result_text), match_count, matched_terms
 
-# OpenAI 요약 기능
-def summarize_text_with_ai(text):
+# OpenAI 요약 기능 (RAG 적용)
+def summarize_text_with_ai(text, matched_terms=None):
     load_dotenv()  # .env 파일 로드
     api_key = os.getenv("OPENAI_API_KEY")  # 환경 변수에서 읽기
     if not api_key:
@@ -61,12 +65,21 @@ def summarize_text_with_ai(text):
 
     client = OpenAI(api_key=api_key)
 
+    # RAG 컨텍스트 생성
+    context = ""
+    if matched_terms:
+        term_explanations = "\n".join([f"- {term}: {summary}" for term, summary in matched_terms.items()])
+        context = f"""[참고할 경제 용어 설명]
+{term_explanations}
+
+위 경제 용어 설명을 참고하여 """
+
     try:
         response = client.chat.completions.create(
             model="gpt-4o-mini",
             messages=[
-                {"role": "system", "content": "너는 경제 뉴스나 리포트를 읽고 핵심 내용을 3줄 요약해주는 AI 비서야. 독자가 이해하기 쉽게 명확하고 간결한 한국어로 요약해줘."},
-                {"role": "user", "content": f"다음 텍스트를 핵심 위주로 3줄 요약해줘:\n\n{text}"}
+                {"role": "system", "content": "너는 경제 뉴스나 리포트를 읽고 핵심 내용을 3줄 요약해주는 AI 비서야. 제공된 경제 용어 설명을 참고하여 독자가 이해하기 쉽게 명확하고 간결한 한국어로 요약해줘."},
+                {"role": "user", "content": f"{context}다음 텍스트를 핵심 위주로 3줄 요약해줘:\n\n{text}"}
             ],
             temperature=0.3,
             max_tokens=300

@@ -34,11 +34,11 @@ def main():
 
     if st.button("분석 및 요약 시작", type="primary"):
         with st.spinner("분석 중..."):
-            # 로직 호출
-            final_html, count = annotate_text_with_kiwi(user_input, term_dict, kiwi)
+            # 로직 호출 (RAG용 matched_terms 포함)
+            final_html, count, matched_terms = annotate_text_with_kiwi(user_input, term_dict, kiwi)
 
         with st.spinner("AI가 내용을 요약하고 있습니다..."):
-            ai_summary = summarize_text_with_ai(user_input)
+            ai_summary = summarize_text_with_ai(user_input, matched_terms)
 
         st.divider()
             
