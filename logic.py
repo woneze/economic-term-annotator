@@ -3,6 +3,8 @@ import json
 import os
 import streamlit as st
 from kiwipiepy import Kiwi
+from openai import OpenAI
+from dotenv import load_dotenv
 
 @st.cache_resource
 def init_kiwi_and_data(filepath):
@@ -49,3 +51,25 @@ def annotate_text_with_kiwi(text, term_dict, kiwi):
     result_text.append(text[last_end:])
     
     return "".join(result_text), match_count
+
+# OpenAI 요약 기능
+def summarize_text_with_ai(text):
+    api_key = load_dotenv("OPENAI_API_KEY")
+    if not api_key:
+        return ".env 파일에 OPENAI_API_KEY가 설정되지 않았습니다."
+
+    client = OpenAI(api_key=api_key)
+
+    try:
+        response = client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[
+                {"role": "system", "content": "너는 경제 뉴스나 리포트를 읽고 핵심 내용을 3줄 요약해주는 AI 비서야. 독자가 이해하기 쉽게 명확하고 간결한 한국어로 요약해줘."},
+                {"role": "user", "content": f"다음 텍스트를 핵심 위주로 3줄 요약해줘:\n\n{text}"}
+            ],
+            temperature=0.3,
+            max_tokens=300
+        )
+        return response.choices[0].message.content
+    except Exception as e:
+        return f"요약 중 오류가 발생했습니다: {str(e)}"

@@ -1,6 +1,6 @@
 import streamlit as st
 from styles import CSS_STYLE  # 스타일 가져오기
-from logic import init_kiwi_and_data, annotate_text_with_kiwi # 로직 가져오기
+from logic import init_kiwi_and_data, annotate_text_with_kiwi, summarize_text_with_ai # 로직 가져오기
 
 # 설정
 st.set_page_config(page_title="경제 용어 AI 주석기", page_icon="💰", layout="wide")
@@ -27,17 +27,29 @@ def main():
     # 사용자 입력 및 처리
     default_text = """
     최근 미국의 기준금리 인상 가능성이 높아지면서 인플레이션 압력이 거세지고 있습니다. 
-    이에 따라 소비자물가지수(CPI)가 예상치를 상회하였으며...
+    이에 따라 소비자물가지수(CPI)가 예상치를 상회하였으며, 한국은행도 통화정책 방향을 고민하고 있습니다.
+    가계부채 문제와 환율 변동성 확대가 주요 리스크 요인으로 지목됩니다.
     """
     user_input = st.text_area("텍스트 입력", value=default_text, height=200)
 
-    if st.button("분석 시작", type="primary"):
+    if st.button("분석 및 요약 시작", type="primary"):
         with st.spinner("분석 중..."):
             # 로직 호출
             final_html, count = annotate_text_with_kiwi(user_input, term_dict, kiwi)
-            
-            st.subheader(f"결과 ({count}개 발견)")
-            st.markdown(f'<div class="text-output">{final_html}</div>', unsafe_allow_html=True)
 
+        with st.spinner("AI가 내용을 요약하고 있습니다..."):
+            ai_summary = summarize_text_with_ai(user_input)
+
+        st.divider()
+            
+        col1, col2 = st.columns([2, 1]) # 왼쪽(본문)을 더 넓게
+        
+        with col1:
+            st.subheader(f"본문에서 ({count}개 용어를 발견했습니다.)")
+            st.markdown(f'<div class="text-output">{final_html}</div>', unsafe_allow_html=True)
+            
+        with col2:
+            st.subheader("AI 3줄 요약")
+            st.markdown(f'<div class="summary-box">{ai_summary}</div>', unsafe_allow_html=True)
 if __name__ == "__main__":
     main()

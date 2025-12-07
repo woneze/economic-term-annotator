@@ -53,6 +53,15 @@ CSS_STYLE = """
         border: 1px solid #ddd;
         line-height: 2.0;
         font-size: 1.1rem;
+    .summary-box {
+        background-color: #f0f8ff; /* 아주 연한 파란색 (AliceBlue) */
+        padding: 20px;
+        border-radius: 10px;
+        border-left: 5px solid #3498db; /* 왼쪽에 파란색 포인트 줄 */
+        line-height: 1.8;
+        font-size: 1.05rem;
+        color: #2c3e50;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.05);    
     }
 </style>
 """
