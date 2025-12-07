@@ -19,24 +19,24 @@ def extract_terms_right_to_left(pdf_path, output_csv):
             if not line or any(x in line for x in ["찾아보기", "경제금융용어", "source:"]):
                 continue
 
-            # [핵심 로직] 오른쪽 끝에서부터 한 글자씩 읽기 (Reverse Iteration)
+            # 오른쪽 끝에서부터 한 글자씩 읽기
             found_separator = False
             cut_index = -1
             
             for i in range(len(line) - 1, -1, -1):
                 char = line[i]
                 
-                # 1. 점선/중점 구역을 만났는지 체크 (Flag 설정)
+                # 점선/중점 구역을 만났는지 체크
                 if char in separators:
                     found_separator = True
                 
-                # 2. 점선을 이미 만난 상태에서('found_separator=True'),
-                #    점선도 아니고 공백도 아닌 '실제 글자'가 나오면 그곳이 단어의 끝(End)임
+                # 점선을 이미 만난 상태에서('found_separator=True'),
+                # 점선도 아니고 공백도 아닌 '실제 글자'가 나오면 그곳이 단어의 끝(End)임
                 if found_separator and char not in separators and char != ' ':
                     cut_index = i
                     break
             
-            # 유효한 단어를 찾았으면 리스트에 추가 (슬라이싱)
+            # 유효한 단어를 찾았으면 리스트에 추가
             if cut_index != -1:
                 term = line[:cut_index + 1].strip()
                 
