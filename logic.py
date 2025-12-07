@@ -54,7 +54,8 @@ def annotate_text_with_kiwi(text, term_dict, kiwi):
 
 # OpenAI 요약 기능
 def summarize_text_with_ai(text):
-    api_key = load_dotenv("OPENAI_API_KEY")
+    load_dotenv()  # .env 파일 로드
+    api_key = os.getenv("OPENAI_API_KEY")  # 환경 변수에서 읽기
     if not api_key:
         return ".env 파일에 OPENAI_API_KEY가 설정되지 않았습니다."
 
