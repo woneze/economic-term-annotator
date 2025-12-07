@@ -40,7 +40,7 @@ def main():
 
         st.divider()
         
-        st.subheader(f"본문에서 ({count}개 용어를 발견했습니다.)")
+        st.subheader(f"본문에서 {count}개 용어를 발견했습니다.")
         st.markdown(f'<div class="text-output">{final_html}</div>', unsafe_allow_html=True)
         
         st.subheader("AI 3줄 요약")
