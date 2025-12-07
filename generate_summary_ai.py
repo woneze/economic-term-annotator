@@ -8,9 +8,7 @@ from openai import OpenAI
 from tqdm import tqdm
 from dotenv import load_dotenv
 
-# ==========================================
-# [설정]
-# ==========================================
+# 설정
 load_dotenv()
 API_KEY = os.getenv("OPENAI_API_KEY")
 MODEL_NAME = "gpt-4o-mini"
@@ -18,7 +16,7 @@ MODEL_NAME = "gpt-4o-mini"
 client = OpenAI(api_key=API_KEY)
 
 def clean_text(text):
-    """PDF 텍스트 전처리: 불필요한 공백과 줄바꿈을 정리"""
+    """PDF 텍스트 전처리"""
     if not text:
         return ""
    
@@ -115,18 +113,18 @@ def main():
     output_file = "data/economic_terms_ai_summary.json"
     failed_file = "data/failed_terms.csv" # 실패한 단어 저장용
 
-    # 1. 용어 로드
+    # 용어 로드
     df = pd.read_csv(csv_file)
     terms = df.iloc[:, 0].dropna().astype(str).tolist()
     print(f"CSV 로드 완료: {len(terms)}개 단어")
 
 
-    # 2. PDF 로드
+    # PDF 로드
     full_pdf_text = get_pdf_text(pdf_file)
     if not full_pdf_text:
         return
 
-    # 3. 기존 진행상황 로드 (이어하기)
+    # 기존 진행상황 로드 (이어하기)
     final_data = load_existing_data(output_file)
     print(f"기존 데이터 로드: {len(final_data)}개")
 
@@ -169,7 +167,7 @@ def main():
             failed_terms.append(current_term)
             continue
 
-    # 4. 결과 저장
+    # 결과 저장
     with open(output_file, 'w', encoding='utf-8') as f:
         json.dump(final_data, f, ensure_ascii=False, indent=4)
     
